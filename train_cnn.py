@@ -71,16 +71,28 @@ class ConvNet(object):
 
     # Add one extra fully connected layer.
     def model_4(self, X, hidden_size, decay):
-        # ======================================================================
-        # Two convolutional layers + two fully connected layers, with ReLU.
-        #
-        # ----------------- YOUR CODE HERE ----------------------
-        #
-        # Uncomment the following return stmt once method implementation is done.
-        # return  fcl
-        # Delete line return NotImplementedError() once method is implemented.
-        return NotImplementedError()
+        weights = tf.Variable(tf.truncated_normal([5, 5, 1, 40], stddev=0.1))
+        biases = tf.Variable(tf.constant(0.1, shape=[40]))
+        X = tf.reshape(X, [-1, 28, 28, 1])
+        conv1 = tf.layers.conv2d(X, filters=40, kernel_size=[5, 5], activation=tf.nn.relu)
+        pool1 = tf.layers.max_pooling2d(conv1, pool_size=[2, 2], strides=1)
 
+        weights2 = tf.Variable(tf.truncated_normal([5, 5, 40, 40], stddev=0.1))
+        biases2 = tf.Variable(tf.constant(0.1, shape=[40]))
+        conv2 = tf.layers.conv2d(pool1, filters=40, kernel_size=[5, 5], activation=tf.nn.relu)
+        pool2 = tf.layers.max_pooling2d(conv2, pool_size=[2, 2], strides=1)
+
+        pool2_flat = tf.contrib.layers.flatten(pool2)
+        weights3 = tf.Variable(tf.truncated_normal([12960, 100], stddev=0.1))
+        biases3 = tf.Variable(tf.constant(0.1, shape=[100]))
+        fcl1 = tf.nn.relu(tf.matmul(pool2_flat, weights3) + biases3)
+
+        fcl1_flat = tf.contrib.layers.flatten(fcl1)
+        weights4 = tf.Variable(tf.truncated_normal([100, 100], stddev=0.1))
+        biases4 = tf.Variable(tf.constant(0.1, shape=[100]))
+        fcl2 = tf.nn.relu(tf.matmul(fcl1_flat, weights4) + biases4)
+        return(fcl2)
+        
     # Use Dropout now.
     def model_5(self, X, hidden_size, is_train):
         # ======================================================================
